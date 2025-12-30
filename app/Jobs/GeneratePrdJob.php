@@ -34,7 +34,7 @@ class GeneratePrdJob implements ShouldBeUnique, ShouldQueue
 
     public function __construct(public string $planRunId)
     {
-        $this->afterCommit = true;
+        $this->afterCommit();
     }
 
     public function uniqueId(): string
