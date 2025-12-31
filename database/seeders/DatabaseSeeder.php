@@ -18,6 +18,7 @@ use App\Models\Story;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Relaticle\Flowforge\Services\Rank;
 
 class DatabaseSeeder extends Seeder
 {
@@ -113,6 +114,11 @@ class DatabaseSeeder extends Seeder
             'sort_order' => 0,
         ]);
 
+        // Generate lexicographic positions for Flowforge
+        $rank1 = Rank::forEmptySequence();
+        $rank2 = Rank::after($rank1);
+        $rank3 = Rank::after($rank2);
+
         Task::create([
             'project_id' => $project->id,
             'epic_id' => $epic->id,
@@ -124,7 +130,7 @@ class DatabaseSeeder extends Seeder
             'estimate' => '2h',
             'labels' => ['backend', 'database'],
             'status' => TaskStatus::Done,
-            'board_order' => 0,
+            'position' => $rank1->get(),
         ]);
 
         Task::create([
@@ -138,7 +144,7 @@ class DatabaseSeeder extends Seeder
             'estimate' => '3h',
             'labels' => ['frontend', 'livewire'],
             'status' => TaskStatus::Doing,
-            'board_order' => 1,
+            'position' => $rank2->get(),
         ]);
 
         Task::create([
@@ -149,7 +155,7 @@ class DatabaseSeeder extends Seeder
             'estimate' => '4h',
             'labels' => ['frontend', 'ux'],
             'status' => TaskStatus::Todo,
-            'board_order' => 2,
+            'position' => $rank3->get(),
         ]);
     }
 }

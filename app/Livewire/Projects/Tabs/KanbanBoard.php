@@ -2,7 +2,11 @@
 
 namespace App\Livewire\Projects\Tabs;
 
+use App\Actions\GenerateTasksFromTechSpec;
+use App\Enums\PlanRunStepStatus;
+use App\Models\Project;
 use App\Models\Task;
+use App\Models\TaskSet;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\CreateAction;
@@ -15,6 +19,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Relaticle\Flowforge\Board;
@@ -50,18 +55,43 @@ class KanbanBoard extends Component implements HasActions, HasBoard, HasForms
                 Column::make('doing')->label('In Progress')->color('info'),
                 Column::make('done')->label('Done')->color('success'),
             ])
-            ->cardSchema(fn (Schema $schema) => $schema->components([
-                TextEntry::make('title')
-                    ->weight('bold')
-                    ->size('sm'),
-                TextEntry::make('description')
-                    ->limit(60)
-                    ->color('gray'),
-                TextEntry::make('estimate')
-                    ->badge()
-                    ->color('primary')
-                    ->visible(fn ($record) => filled($record->estimate)),
-            ]))
+            ->cardSchema(fn (Schema $schema) => $schema
+                ->extraAttributes(['class' => 'space-y-2'])
+                ->components([
+                    TextEntry::make('description')
+                        ->hiddenLabel()
+                        ->limit(100)
+                        ->color('gray')
+                        ->size('sm'),
+                    TextEntry::make('badges')
+                        ->hiddenLabel()
+                        ->state(fn ($record) => collect([
+                            $record->category ? [
+                                'label' => match ($record->category?->value ?? $record->category) {
+                                    'backend' => 'Backend',
+                                    'frontend' => 'Frontend',
+                                    'db' => 'DB',
+                                    'infra' => 'Infra',
+                                    'tests' => 'Tests',
+                                    'docs' => 'Docs',
+                                    default => $record->category,
+                                },
+                                'color' => match ($record->category?->value ?? $record->category) {
+                                    'backend' => 'success',
+                                    'frontend' => 'info',
+                                    'db' => 'warning',
+                                    'tests' => 'primary',
+                                    default => 'gray',
+                                },
+                            ] : null,
+                            $record->estimate ? [
+                                'label' => $record->estimate,
+                                'color' => 'gray',
+                                'icon' => true,
+                            ] : null,
+                        ])->filter()->values()->toArray())
+                        ->view('components.task-badges'),
+                ]))
             ->columnActions([
                 CreateAction::make()
                     ->label('Add task')
@@ -121,9 +151,58 @@ class KanbanBoard extends Component implements HasActions, HasBoard, HasForms
 
     #[On('tasksUpdated')]
     #[On('planRunCompleted')]
+    #[On('taskGenerationStarted')]
     public function refreshBoard(): void
     {
-        // Flowforge handles refresh automatically via Livewire reactivity
+        unset($this->latestTaskSet);
+        unset($this->isStale);
+        unset($this->isGeneratingTasks);
+    }
+
+    #[Computed]
+    public function latestTaskSet(): ?TaskSet
+    {
+        return TaskSet::where('project_id', $this->projectId)
+            ->with(['planRunStep', 'sourceTechVersion'])
+            ->latest()
+            ->first();
+    }
+
+    #[Computed]
+    public function isStale(): bool
+    {
+        return $this->latestTaskSet?->isStale() ?? false;
+    }
+
+    #[Computed]
+    public function isGeneratingTasks(): bool
+    {
+        $taskSet = $this->latestTaskSet;
+
+        if (! $taskSet) {
+            return false;
+        }
+
+        return in_array($taskSet->status, [
+            PlanRunStepStatus::Queued,
+            PlanRunStepStatus::Running,
+            PlanRunStepStatus::Delayed,
+        ]);
+    }
+
+    public function regenerateTasks(): void
+    {
+        if ($this->isGeneratingTasks) {
+            return;
+        }
+
+        $project = Project::findOrFail($this->projectId);
+        $action = new GenerateTasksFromTechSpec;
+        $action->handle($project);
+
+        unset($this->latestTaskSet);
+        unset($this->isStale);
+        unset($this->isGeneratingTasks);
     }
 
     public function render()

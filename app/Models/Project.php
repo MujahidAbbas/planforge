@@ -56,4 +56,14 @@ class Project extends Model
     {
         return $this->hasMany(Task::class);
     }
+
+    public function taskSets(): HasMany
+    {
+        return $this->hasMany(TaskSet::class);
+    }
+
+    public function latestTaskSet(): ?TaskSet
+    {
+        return $this->taskSets()->latest()->first();
+    }
 }

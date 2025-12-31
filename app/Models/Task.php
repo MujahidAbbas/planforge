@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\TaskCategory;
+use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,13 +21,17 @@ class Task extends Model
         'story_id',
         'plan_run_id',
         'plan_run_step_id',
+        'task_set_id',
         'title',
         'description',
         'acceptance_criteria',
         'estimate',
         'labels',
         'depends_on',
+        'source_refs',
         'status',
+        'category',
+        'priority',
         'position',
     ];
 
@@ -35,7 +41,10 @@ class Task extends Model
             'acceptance_criteria' => 'array',
             'labels' => 'array',
             'depends_on' => 'array',
+            'source_refs' => 'array',
             'status' => TaskStatus::class,
+            'category' => TaskCategory::class,
+            'priority' => TaskPriority::class,
         ];
     }
 
@@ -62,5 +71,10 @@ class Task extends Model
     public function planRunStep(): BelongsTo
     {
         return $this->belongsTo(PlanRunStep::class);
+    }
+
+    public function taskSet(): BelongsTo
+    {
+        return $this->belongsTo(TaskSet::class);
     }
 }

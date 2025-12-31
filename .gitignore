@@ -27,3 +27,7 @@ Homestead.yaml
 Thumbs.db
 /docs
 /CLAUDE.md
+
+# SQLite test databases
+planforge_test_*
+planforge
