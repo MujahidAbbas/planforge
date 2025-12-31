@@ -2,9 +2,13 @@
 
 namespace App\Livewire\Projects\Tabs;
 
+use App\Actions\GenerateTasksFromTechSpec;
 use App\Enums\DocumentType;
+use App\Enums\PlanRunStepStatus;
 use App\Models\Document;
 use App\Models\DocumentVersion;
+use App\Models\Project;
+use App\Models\TaskSet;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -81,6 +85,54 @@ class Tech extends Component
     {
         unset($this->document);
         $this->loadContent();
+    }
+
+    #[Computed]
+    public function latestTaskSet(): ?TaskSet
+    {
+        return TaskSet::where('project_id', $this->projectId)
+            ->with('planRunStep')
+            ->latest()
+            ->first();
+    }
+
+    #[Computed]
+    public function isGeneratingTasks(): bool
+    {
+        $taskSet = $this->latestTaskSet;
+
+        if (! $taskSet) {
+            return false;
+        }
+
+        return in_array($taskSet->status, [
+            PlanRunStepStatus::Queued,
+            PlanRunStepStatus::Running,
+            PlanRunStepStatus::Delayed,
+        ]);
+    }
+
+    public function generateTasks(): void
+    {
+        if ($this->isGeneratingTasks) {
+            return;
+        }
+
+        $project = Project::findOrFail($this->projectId);
+        $action = new GenerateTasksFromTechSpec;
+        $action->handle($project);
+
+        unset($this->latestTaskSet);
+        unset($this->isGeneratingTasks);
+
+        $this->dispatch('taskGenerationStarted');
+    }
+
+    #[On('taskGenerationCompleted')]
+    public function handleTaskGenerationCompleted(): void
+    {
+        unset($this->latestTaskSet);
+        unset($this->isGeneratingTasks);
     }
 
     public function render()
