@@ -65,7 +65,7 @@ class GenerateTasksFromTechSpec
 
             GenerateTasksJob::dispatch($run->id, $taskSet->id);
 
-            return $taskSet;
+            return $taskSet->load('planRunStep');
         });
     }
 }
