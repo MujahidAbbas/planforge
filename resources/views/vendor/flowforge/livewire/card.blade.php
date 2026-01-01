@@ -20,7 +20,7 @@
 
 <div
     @class([
-        'flowforge-card mb-3 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md',
+        'flowforge-card mb-3 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all duration-200 hover:shadow-md',
         $priorityBorderClass,
         'cursor-pointer' => $hasActions || $hasCardAction,
         'cursor-pointer transition-all duration-100 ease-in-out hover:shadow-lg hover:border-gray-400 active:shadow-md' => $hasCardAction,
@@ -36,7 +36,7 @@
 >
     <div class="flowforge-card-content">
         <div class="flex items-start justify-between">
-            <h4 class="text-sm font-semibold text-gray-900 dark:text-white px-3 pt-3 pb-1 leading-tight"
+            <h4 class="text-sm font-semibold text-gray-900 px-3 pt-3 pb-1 leading-tight"
                 @if($hasCardAction && $cardAction)
                     wire:click="mountAction('{{ $cardAction }}', [], @js(['recordKey' => $record['id']]))"
                 style="cursor: pointer;"

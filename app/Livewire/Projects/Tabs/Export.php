@@ -4,15 +4,21 @@ namespace App\Livewire\Projects\Tabs;
 
 use App\Enums\DocumentType;
 use App\Models\Project;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class Export extends Component
 {
+    use AuthorizesRequests;
+
     public string $projectId;
 
     public function mount(string $projectId): void
     {
+        $project = Project::findOrFail($projectId);
+        $this->authorize('view', $project);
+
         $this->projectId = $projectId;
     }
 

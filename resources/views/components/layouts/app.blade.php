@@ -12,7 +12,7 @@
     @filamentScripts
     <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <aside class="w-64 bg-gray-900 text-white flex-shrink-0">
+        <aside class="w-64 bg-gray-900 text-white flex-shrink-0 relative flex flex-col">
             <div class="p-4">
                 <a href="{{ route('projects.index') }}" wire:navigate class="flex items-center gap-2">
                     <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,6 +37,29 @@
                     {{ $sidebar }}
                 </div>
             @endif
+
+            <!-- User Menu -->
+            <div class="mt-auto p-4 border-t border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-sm font-medium">
+                            {{ substr(auth()->user()->name, 0, 1) }}
+                        </div>
+                        <div class="truncate">
+                            <p class="text-sm font-medium text-white truncate">{{ auth()->user()->name }}</p>
+                            <p class="text-xs text-gray-400 truncate">{{ auth()->user()->email }}</p>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition" title="Logout">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </aside>
 
         <!-- Main Content -->

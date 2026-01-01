@@ -24,8 +24,7 @@ class Workspace extends Component
 
     public function mount(Project $project): void
     {
-        // Authorization disabled for now - add back when auth is set up
-        // $this->authorize('view', $project);
+        $this->authorize('view', $project);
         $this->projectId = $project->id;
     }
 
@@ -49,7 +48,7 @@ class Workspace extends Component
 
         $run = app(StartPlanRun::class)->handle(
             $this->project,
-            1 // Would be auth()->id() with real auth
+            auth()->id()
         );
 
         $this->dispatch('planRunStarted', runId: $run->id);
@@ -61,7 +60,7 @@ class Workspace extends Component
 
         $run = app(RegeneratePrd::class)->handle(
             $this->project,
-            1, // Would be auth()->id() with real auth
+            auth()->id(),
             $includeDownstream
         );
 
@@ -74,7 +73,7 @@ class Workspace extends Component
 
         $run = app(RegenerateTech::class)->handle(
             $this->project,
-            1 // Would be auth()->id() with real auth
+            auth()->id()
         );
 
         $this->dispatch('planRunStarted', runId: $run->id);

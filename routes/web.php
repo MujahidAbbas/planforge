@@ -1,38 +1,41 @@
 <?php
 
 use App\Http\Controllers\ProjectExportController;
-use App\Livewire\HelloWorld;
+use App\Livewire\Actions\Logout;
 use App\Livewire\Projects\Index as ProjectsIndex;
 use App\Livewire\Projects\Workspace;
 use Illuminate\Support\Facades\Route;
-use Prism\Prism\Enums\Provider;
-use Prism\Prism\Facades\Prism;
 
+// Welcome page redirects based on auth status
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect()->route('projects.index');
+    }
+
+    return redirect()->route('login');
 });
 
-Route::get('/hello', HelloWorld::class);
+// Protected routes - require authentication
+Route::middleware('auth')->group(function () {
+    // Projects
+    Route::get('/projects', ProjectsIndex::class)->name('projects.index');
+    Route::get('/projects/{project}', Workspace::class)->name('projects.workspace');
 
-Route::get('/ai-test', function () {
-    $response = Prism::text()
-        ->using(Provider::Anthropic, 'claude-sonnet-4-20250514')
-        ->withMaxTokens(100)
-        ->withPrompt('Say "Hello from Prism!" and nothing else.')
-        ->asText();
+    // Exports
+    Route::get('/projects/{project}/exports/project-kit', [ProjectExportController::class, 'projectKit'])
+        ->name('projects.exports.projectKit');
+    Route::get('/projects/{project}/exports/tasks.json', [ProjectExportController::class, 'tasksJson'])
+        ->name('projects.exports.tasksJson');
 
-    return response()->json([
-        'success' => true,
-        'response' => $response->text,
-    ]);
+    // Profile (from Breeze)
+    Route::view('profile', 'profile')->name('profile');
+
+    // Logout
+    Route::post('logout', function (Logout $logout) {
+        $logout();
+
+        return redirect('/');
+    })->name('logout');
 });
 
-// Project routes (auth middleware disabled for now - add back when auth is set up)
-Route::get('/projects', ProjectsIndex::class)->name('projects.index');
-Route::get('/projects/{project}', Workspace::class)->name('projects.workspace');
-
-// Export routes
-Route::get('/projects/{project}/exports/project-kit', [ProjectExportController::class, 'projectKit'])
-    ->name('projects.exports.projectKit');
-Route::get('/projects/{project}/exports/tasks.json', [ProjectExportController::class, 'tasksJson'])
-    ->name('projects.exports.tasksJson');
+require __DIR__.'/auth.php';

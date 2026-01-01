@@ -7,6 +7,7 @@ use App\Enums\PlanRunStepStatus;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskSet;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\CreateAction;
@@ -29,6 +30,7 @@ use Relaticle\Flowforge\Contracts\HasBoard;
 
 class KanbanBoard extends Component implements HasActions, HasBoard, HasForms
 {
+    use AuthorizesRequests;
     use InteractsWithActions {
         InteractsWithBoard::getDefaultActionRecord insteadof InteractsWithActions;
     }
@@ -39,6 +41,9 @@ class KanbanBoard extends Component implements HasActions, HasBoard, HasForms
 
     public function mount(string $projectId): void
     {
+        $project = Project::findOrFail($projectId);
+        $this->authorize('view', $project);
+
         $this->projectId = $projectId;
     }
 

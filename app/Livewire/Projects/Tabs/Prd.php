@@ -5,12 +5,16 @@ namespace App\Livewire\Projects\Tabs;
 use App\Enums\DocumentType;
 use App\Models\Document;
 use App\Models\DocumentVersion;
+use App\Models\Project;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Prd extends Component
 {
+    use AuthorizesRequests;
+
     public string $projectId;
 
     public string $content = '';
@@ -19,6 +23,9 @@ class Prd extends Component
 
     public function mount(string $projectId): void
     {
+        $project = Project::findOrFail($projectId);
+        $this->authorize('view', $project);
+
         $this->projectId = $projectId;
         $this->loadContent();
     }
@@ -58,7 +65,7 @@ class Prd extends Component
         // Create a new version (append-only)
         $version = DocumentVersion::create([
             'document_id' => $document->id,
-            'created_by' => 1, // Would be auth()->id() with real auth
+            'created_by' => auth()->id(),
             'content_md' => $this->content,
         ]);
 

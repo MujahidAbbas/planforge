@@ -8,6 +8,7 @@ use App\Enums\PlanRunStepStatus;
 use App\Models\Document;
 use App\Models\DocumentVersion;
 use App\Models\Project;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\TaskSet;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -15,6 +16,8 @@ use Livewire\Component;
 
 class Tech extends Component
 {
+    use AuthorizesRequests;
+
     public string $projectId;
 
     public string $content = '';
@@ -23,6 +26,9 @@ class Tech extends Component
 
     public function mount(string $projectId): void
     {
+        $project = Project::findOrFail($projectId);
+        $this->authorize('view', $project);
+
         $this->projectId = $projectId;
         $this->loadContent();
     }
@@ -60,7 +66,7 @@ class Tech extends Component
 
         $version = DocumentVersion::create([
             'document_id' => $document->id,
-            'created_by' => 1,
+            'created_by' => auth()->id(),
             'content_md' => $this->content,
         ]);
 
