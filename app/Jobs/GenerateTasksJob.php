@@ -20,7 +20,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
-use Prism\Prism\Enums\Provider;
 use Prism\Prism\Exceptions\PrismRateLimitedException;
 use Prism\Prism\Facades\Prism;
 use Relaticle\Flowforge\Services\Rank;
@@ -28,6 +27,7 @@ use Throwable;
 
 class GenerateTasksJob implements ShouldBeUnique, ShouldQueue
 {
+    use Concerns\ResolvesAiProvider;
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 5;
@@ -266,18 +266,6 @@ class GenerateTasksJob implements ShouldBeUnique, ShouldQueue
         ]);
 
         throw $e;
-    }
-
-    private function resolveProvider(string $provider): Provider
-    {
-        return match ($provider) {
-            'anthropic' => Provider::Anthropic,
-            'openai' => Provider::OpenAI,
-            'gemini' => Provider::Gemini,
-            'mistral' => Provider::Mistral,
-            'groq' => Provider::Groq,
-            default => Provider::Anthropic,
-        };
     }
 
     private function truncate(?string $text, int $length): ?string

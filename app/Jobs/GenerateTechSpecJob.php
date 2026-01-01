@@ -17,13 +17,13 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\SerializesModels;
-use Prism\Prism\Enums\Provider;
 use Prism\Prism\Exceptions\PrismRateLimitedException;
 use Prism\Prism\Facades\Prism;
 use Throwable;
 
 class GenerateTechSpecJob implements ShouldBeUnique, ShouldQueue
 {
+    use Concerns\ResolvesAiProvider;
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 5;
@@ -183,17 +183,5 @@ class GenerateTechSpecJob implements ShouldBeUnique, ShouldQueue
             ]);
             throw $e;
         }
-    }
-
-    private function resolveProvider(string $provider): Provider
-    {
-        return match ($provider) {
-            'anthropic' => Provider::Anthropic,
-            'openai' => Provider::OpenAI,
-            'gemini' => Provider::Gemini,
-            'mistral' => Provider::Mistral,
-            'groq' => Provider::Groq,
-            default => Provider::Anthropic,
-        };
     }
 }
