@@ -5,12 +5,14 @@ namespace App\Livewire\Projects;
 use App\Enums\AiProvider;
 use App\Livewire\Concerns\ManagesProviderSelection;
 use App\Models\Project;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class SettingsModal extends Component
 {
+    use AuthorizesRequests;
     use ManagesProviderSelection;
 
     public bool $show = false;
@@ -20,8 +22,10 @@ class SettingsModal extends Component
     #[On('openSettings')]
     public function open(string $projectId): void
     {
-        $this->projectId = $projectId;
         $project = Project::findOrFail($projectId);
+        $this->authorize('update', $project);
+
+        $this->projectId = $projectId;
 
         $this->initializeFromProject(
             $project->preferred_provider ?? '',
@@ -42,6 +46,8 @@ class SettingsModal extends Component
         $this->validate($this->getProviderValidationRules());
 
         $project = Project::findOrFail($this->projectId);
+        $this->authorize('update', $project);
+
         $project->update([
             'preferred_provider' => $this->selectedProvider,
             'preferred_model' => $this->getFinalModel(),

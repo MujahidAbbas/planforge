@@ -12,12 +12,11 @@ class ProjectExportController extends Controller
 {
     public function projectKit(Project $project, ProjectKitExporter $exporter): StreamedResponse
     {
-        // Authorization disabled for now - add back when auth is set up
-        // $this->authorize('view', $project);
+        $this->authorize('view', $project);
 
         $export = $exporter->export(
             $project,
-            1 // Would be auth()->id() with real auth
+            auth()->id()
         );
 
         return Storage::disk($export->disk)->download($export->path, $export->filename);
@@ -25,8 +24,7 @@ class ProjectExportController extends Controller
 
     public function tasksJson(Project $project): JsonResponse
     {
-        // Authorization disabled for now - add back when auth is set up
-        // $this->authorize('view', $project);
+        $this->authorize('view', $project);
 
         $project->load('tasks');
 

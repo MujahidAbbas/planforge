@@ -77,9 +77,9 @@
         @if (filled($filterIndicatorsView = FilamentView::renderHook(TablesRenderHook::FILTER_INDICATORS, scopes: static::class, data: ['filterIndicators' => $filterIndicators])))
             {{ $filterIndicatorsView }}
         @else
-            <div class="fi-ta-filter-indicators flex items-start justify-between gap-x-3 bg-gray-50 pt-3 dark:bg-white/5">
+            <div class="fi-ta-filter-indicators flex items-start justify-between gap-x-3 bg-gray-50 pt-3">
                 <div class="flex flex-col gap-x-3 gap-y-1 sm:flex-row">
-                        <span class="fi-ta-filter-indicators-label text-sm leading-6 font-medium whitespace-nowrap text-gray-700 dark:text-gray-200">
+                        <span class="fi-ta-filter-indicators-label text-sm leading-6 font-medium whitespace-nowrap text-gray-700">
                             {{ __('filament-tables::table.filters.indicator') }}
                         </span>
 

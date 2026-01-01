@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
 beforeEach(function () {
@@ -47,7 +48,7 @@ it('downloads a project kit zip export', function () {
         'status' => TaskStatus::Doing,
     ]);
 
-    $response = get(route('projects.exports.projectKit', $project));
+    $response = actingAs($user)->get(route('projects.exports.projectKit', $project));
 
     $response->assertOk();
     $response->assertDownload();
@@ -94,7 +95,7 @@ it('exports tasks as json with stable structure', function () {
 
     Task::factory()->for($project)->count(3)->create(['status' => TaskStatus::Todo]);
 
-    $response = get(route('projects.exports.tasksJson', $project));
+    $response = actingAs($user)->get(route('projects.exports.tasksJson', $project));
 
     $response->assertOk();
     $response->assertJsonStructure([
@@ -126,7 +127,7 @@ it('returns empty tasks array when project has no tasks', function () {
     $user = User::factory()->create();
     $project = Project::factory()->for($user)->create();
 
-    $response = get(route('projects.exports.tasksJson', $project));
+    $response = actingAs($user)->get(route('projects.exports.tasksJson', $project));
 
     $response->assertOk();
     $response->assertJson([
@@ -146,7 +147,7 @@ it('includes task status values correctly', function () {
     Task::factory()->for($project)->doing()->create(['title' => 'Doing Task']);
     Task::factory()->for($project)->done()->create(['title' => 'Done Task']);
 
-    $response = get(route('projects.exports.tasksJson', $project));
+    $response = actingAs($user)->get(route('projects.exports.tasksJson', $project));
 
     $response->assertOk();
     $data = $response->json();
@@ -159,7 +160,7 @@ it('creates export record when downloading project kit', function () {
     $user = User::factory()->create();
     $project = Project::factory()->for($user)->create();
 
-    get(route('projects.exports.projectKit', $project));
+    actingAs($user)->get(route('projects.exports.projectKit', $project));
 
     $this->assertDatabaseHas('exports', [
         'project_id' => $project->id,

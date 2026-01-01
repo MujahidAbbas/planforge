@@ -12,14 +12,14 @@
 @endphp
 
 <div
-    class="flowforge-column w-[300px] min-w-[300px] flex-shrink-0 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-md rounded-xl flex flex-col max-h-full overflow-hidden">
+    class="flowforge-column w-[300px] min-w-[300px] flex-shrink-0 border border-gray-200 shadow-sm rounded-xl flex flex-col max-h-full overflow-hidden">
     <!-- Column Header -->
-    <div class="flowforge-column-header flex items-center justify-between py-3 px-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="flowforge-column-header flex items-center justify-between py-3 px-4 border-b border-gray-200">
         <div class="flex items-center">
             @if ($column['icon'] ?? null)
-                <x-filament::icon :icon="$column['icon']" class="h-4 w-4 text-gray-500 dark:text-gray-400 me-2" />
+                <x-filament::icon :icon="$column['icon']" class="h-4 w-4 text-gray-500 me-2" />
             @endif
-            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-200">
+            <h3 class="text-sm font-medium text-gray-700">
                 {{ $column['label'] }}
             </h3>
 
@@ -41,15 +41,15 @@
                     ])
                     @class([
                         'ms-2 items-center border px-2 py-0.5 rounded-md text-xs font-semibold',
-                        'bg-custom-50 dark:bg-custom-600/20',
-                        'text-custom-700 dark:text-custom-300',
-                        'border-custom-700/30 dark:border-custom-300/30',
+                        'bg-custom-50',
+                        'text-custom-700',
+                        'border-custom-700/30',
                     ])>
                     {{ $column['total'] ?? (isset($column['items']) ? count($column['items']) : 0) }}
                 </div>
             @else
                 {{-- Fallback: simple gray badge if no color --}}
-                <div class="ms-2 items-center border px-2 py-0.5 rounded-md text-xs font-semibold bg-gray-50 dark:bg-gray-600/20 text-gray-700 dark:text-gray-300 border-gray-700/30 dark:border-gray-300/30">
+                <div class="ms-2 items-center border px-2 py-0.5 rounded-md text-xs font-semibold bg-gray-50 text-gray-700 border-gray-700/30">
                     {{ $column['total'] ?? (isset($column['items']) ? count($column['items']) : 0) }}
                 </div>
             @endif
@@ -106,7 +106,7 @@
 
                         <div x-show="isLoadingColumn('{{ $columnId }}')"
                              x-transition
-                             class="text-xs text-primary-600 dark:text-primary-400 flex items-center justify-center gap-2">
+                             class="text-xs text-primary-600 flex items-center justify-center gap-2">
                             {{ __('flowforge::flowforge.loading_more_cards') }}
                         </div>
                     </div>

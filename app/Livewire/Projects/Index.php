@@ -48,9 +48,8 @@ class Index extends Component
 
         $this->validate($rules);
 
-        // For now, use user_id = 1 (test user) since we don't have auth yet
         $project = Project::create([
-            'user_id' => 1,
+            'user_id' => auth()->id(),
             'name' => $this->name,
             'idea' => $this->idea,
             'preferred_provider' => $this->selectedProvider,
@@ -64,8 +63,8 @@ class Index extends Component
 
     public function render()
     {
-        // For now, show all projects (would filter by auth user later)
         $projects = Project::query()
+            ->where('user_id', auth()->id())
             ->where('status', ProjectStatus::Active)
             ->latest()
             ->get();
