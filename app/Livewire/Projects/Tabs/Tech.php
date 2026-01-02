@@ -5,11 +5,12 @@ namespace App\Livewire\Projects\Tabs;
 use App\Actions\GenerateTasksFromTechSpec;
 use App\Enums\DocumentType;
 use App\Enums\PlanRunStepStatus;
+use App\Livewire\Concerns\HasVersionHistory;
 use App\Models\Document;
 use App\Models\DocumentVersion;
 use App\Models\Project;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\TaskSet;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -17,6 +18,7 @@ use Livewire\Component;
 class Tech extends Component
 {
     use AuthorizesRequests;
+    use HasVersionHistory;
 
     public string $projectId;
 
