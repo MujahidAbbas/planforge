@@ -93,30 +93,6 @@ Visit `http://localhost:8000` to create an account and get started.
 7. **Regenerate** - Use the Regenerate dropdown to refresh specific documents
 8. **Export** - Download your project kit as a ZIP file
 
-## Project Structure
-
-```
-app/
-├── Actions/           # Business logic (StartPlanRun, Regenerate*, GenerateTasks*)
-├── Enums/            # Status enums (PlanRunStatus, TaskStatus, etc.)
-├── Jobs/             # Queue jobs (GeneratePrdJob, GenerateTechSpecJob, GenerateTasksJob)
-├── Livewire/         # Livewire components
-│   ├── Concerns/     # Shared traits (HasVersionHistory)
-│   └── Projects/
-│       ├── Workspace.php
-│       └── Tabs/     # PRD, Tech, Kanban, Export tabs
-├── Models/           # Eloquent models
-├── Policies/         # Authorization policies
-└── Services/         # Services (ProjectKitExporter)
-
-resources/
-├── views/
-│   ├── components/   # Blade components (version-history-slide-over, etc.)
-│   ├── livewire/     # Livewire component views
-│   └── prompts/      # AI prompt templates
-└── css/              # Tailwind styles
-```
-
 ## Testing
 
 ```bash
