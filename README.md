@@ -10,9 +10,13 @@ PlanForge is a self-hosted project planning tool that uses AI to generate compre
 ## Features
 
 - **AI-Powered Generation** - Transform project ideas into structured documentation
+- **Multi-Provider AI** - Support for Anthropic Claude, OpenAI GPT, and Google Gemini
 - **PRD Generation** - Automatic Product Requirements Document creation
 - **Tech Spec Generation** - Detailed technical specifications based on the PRD
+- **Task Generation** - Break down tech specs into actionable development tasks
+- **Version History** - Browse, preview, and restore previous document versions
 - **Kanban Board** - Drag-and-drop task management with Flowforge
+- **User Authentication** - Secure login with email/password or GitHub OAuth
 - **Regeneration** - Regenerate individual documents or the entire pipeline
 - **Export** - Download project kit as ZIP (PRD, Tech Spec, Tasks, metadata)
 - **Rate Limit Resilience** - Graceful handling of API rate limits with automatic retries
@@ -21,7 +25,8 @@ PlanForge is a self-hosted project planning tool that uses AI to generate compre
 
 - **Backend**: Laravel 12, PHP 8.3+
 - **Frontend**: Livewire 3, Alpine.js, Tailwind CSS
-- **AI**: PrismPHP (Anthropic Claude, OpenAI, and more)
+- **AI**: PrismPHP (Anthropic Claude, OpenAI, Google Gemini)
+- **Auth**: Laravel Breeze, Laravel Socialite
 - **Kanban**: Filament 4 + Flowforge
 - **Database**: SQLite (default) or MySQL/PostgreSQL
 - **Queue**: Database driver (Redis optional)
@@ -33,7 +38,7 @@ PlanForge is a self-hosted project planning tool that uses AI to generate compre
 - PHP 8.3+
 - Composer
 - Node.js 18+
-- An Anthropic API key ([get one here](https://console.anthropic.com/))
+- An API key from one of: [Anthropic](https://console.anthropic.com/), [OpenAI](https://platform.openai.com/), or [Google AI](https://makersuite.google.com/app/apikey)
 
 ### Installation
 
@@ -50,8 +55,7 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
-# Add your Anthropic API key to .env
-# ANTHROPIC_API_KEY=sk-ant-...
+# Configure your AI provider in .env (see Configuration section)
 
 # Create database and run migrations
 touch database/database.sqlite
@@ -76,33 +80,38 @@ php artisan queue:listen   # Queue worker (required for AI generation)
 npm run dev               # Vite dev server
 ```
 
-Visit `http://localhost:8000/projects` to get started.
+Visit `http://localhost:8000` to create an account and get started.
 
 ## Usage
 
-1. **Create a Project** - Enter your project idea and any constraints
-2. **Generate** - Click "Generate All" to create PRD, Tech Spec, and Tasks
-3. **Review & Edit** - Edit the generated documents in the PRD and Tech tabs
-4. **Manage Tasks** - Drag tasks between columns in the Kanban board
-5. **Regenerate** - Use the Regenerate dropdown to refresh specific documents
-6. **Export** - Download your project kit as a ZIP file
+1. **Create Account** - Register with email/password or sign in with GitHub
+2. **Create a Project** - Enter your project idea and any constraints
+3. **Generate** - Click "Generate All" to create PRD, Tech Spec, and Tasks
+4. **Review & Edit** - Edit the generated documents in the PRD and Tech tabs
+5. **Version History** - Click the clock icon to browse and restore previous versions
+6. **Manage Tasks** - Drag tasks between columns in the Kanban board
+7. **Regenerate** - Use the Regenerate dropdown to refresh specific documents
+8. **Export** - Download your project kit as a ZIP file
 
 ## Project Structure
 
 ```
 app/
-├── Actions/           # Business logic (StartPlanRun, Regenerate*)
+├── Actions/           # Business logic (StartPlanRun, Regenerate*, GenerateTasks*)
 ├── Enums/            # Status enums (PlanRunStatus, TaskStatus, etc.)
-├── Jobs/             # Queue jobs (GeneratePrdJob, GenerateTechSpecJob)
+├── Jobs/             # Queue jobs (GeneratePrdJob, GenerateTechSpecJob, GenerateTasksJob)
 ├── Livewire/         # Livewire components
+│   ├── Concerns/     # Shared traits (HasVersionHistory)
 │   └── Projects/
 │       ├── Workspace.php
 │       └── Tabs/     # PRD, Tech, Kanban, Export tabs
 ├── Models/           # Eloquent models
+├── Policies/         # Authorization policies
 └── Services/         # Services (ProjectKitExporter)
 
 resources/
 ├── views/
+│   ├── components/   # Blade components (version-history-slide-over, etc.)
 │   ├── livewire/     # Livewire component views
 │   └── prompts/      # AI prompt templates
 └── css/              # Tailwind styles
@@ -125,10 +134,36 @@ resources/
 
 ### AI Provider
 
-PlanForge uses Anthropic Claude by default. Configure in `.env`:
+PlanForge supports multiple AI providers. Configure your preferred provider in `.env`:
+
+**Anthropic Claude (default):**
+```env
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+**OpenAI GPT:**
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4o  # Optional, defaults to gpt-4o
+```
+
+**Google Gemini:**
+```env
+AI_PROVIDER=gemini
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-2.0-flash  # Optional
+```
+
+### GitHub OAuth (Optional)
+
+To enable "Sign in with GitHub":
 
 ```env
-ANTHROPIC_API_KEY=sk-ant-...
+GITHUB_CLIENT_ID=your-client-id
+GITHUB_CLIENT_SECRET=your-client-secret
+GITHUB_REDIRECT_URI=http://localhost:8000/auth/github/callback
 ```
 
 ### Queue Driver
@@ -142,11 +177,14 @@ REDIS_HOST=127.0.0.1
 
 ## Roadmap
 
-- [ ] Task generation from Tech Spec
+- [x] ~~Task generation from Tech Spec~~ (v0.2.0)
+- [x] ~~Multiple AI provider support~~ (v0.3.0)
+- [x] ~~User authentication~~ (v0.4.0)
+- [x] ~~Version history~~ (v0.5.0)
 - [ ] GitHub Issues export
-- [ ] Multiple AI provider support
 - [ ] Team collaboration
 - [ ] Project templates
+- [ ] Diff comparison for versions
 
 ## Contributing
 
