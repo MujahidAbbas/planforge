@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
 
 beforeEach(function () {
     Storage::fake('local');
