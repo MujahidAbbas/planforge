@@ -16,7 +16,7 @@ PlanForge is a self-hosted project planning tool that uses AI to generate compre
 - **Task Generation** - Break down tech specs into actionable development tasks
 - **Version History** - Browse, preview, and restore previous document versions
 - **Kanban Board** - Drag-and-drop task management with Flowforge
-- **User Authentication** - Secure login with email/password or GitHub OAuth
+- **User Authentication** - Secure login with email/password
 - **Regeneration** - Regenerate individual documents or the entire pipeline
 - **Export** - Download project kit as ZIP (PRD, Tech Spec, Tasks, metadata)
 - **Rate Limit Resilience** - Graceful handling of API rate limits with automatic retries
@@ -26,7 +26,7 @@ PlanForge is a self-hosted project planning tool that uses AI to generate compre
 - **Backend**: Laravel 12, PHP 8.3+
 - **Frontend**: Livewire 3, Alpine.js, Tailwind CSS
 - **AI**: PrismPHP (Anthropic Claude, OpenAI, Google Gemini)
-- **Auth**: Laravel Breeze, Laravel Socialite
+- **Auth**: Laravel Breeze
 - **Kanban**: Filament 4 + Flowforge
 - **Database**: SQLite (default) or MySQL/PostgreSQL
 - **Queue**: Database driver (Redis optional)
@@ -84,7 +84,7 @@ Visit `http://localhost:8000` to create an account and get started.
 
 ## Usage
 
-1. **Create Account** - Register with email/password or sign in with GitHub
+1. **Create Account** - Register with email/password
 2. **Create a Project** - Enter your project idea and any constraints
 3. **Generate** - Click "Generate All" to create PRD, Tech Spec, and Tasks
 4. **Review & Edit** - Edit the generated documents in the PRD and Tech tabs
@@ -156,16 +156,6 @@ GEMINI_API_KEY=...
 GEMINI_MODEL=gemini-2.0-flash  # Optional
 ```
 
-### GitHub OAuth (Optional)
-
-To enable "Sign in with GitHub":
-
-```env
-GITHUB_CLIENT_ID=your-client-id
-GITHUB_CLIENT_SECRET=your-client-secret
-GITHUB_REDIRECT_URI=http://localhost:8000/auth/github/callback
-```
-
 ### Queue Driver
 
 For production, consider using Redis:
@@ -182,6 +172,7 @@ REDIS_HOST=127.0.0.1
 - [x] ~~User authentication~~ (v0.4.0)
 - [x] ~~Version history~~ (v0.5.0)
 - [ ] GitHub Issues export
+- [ ] GitHub OAuth login
 - [ ] Team collaboration
 - [ ] Project templates
 - [ ] Diff comparison for versions
