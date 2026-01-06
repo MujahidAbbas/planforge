@@ -20,6 +20,7 @@ PlanForge is a self-hosted project planning tool that uses AI to generate compre
 - **Regeneration** - Regenerate individual documents or the entire pipeline
 - **Export** - Download project kit as ZIP (PRD, Tech Spec, Tasks, metadata)
 - **Rate Limit Resilience** - Graceful handling of API rate limits with automatic retries
+- **GitHub Integration** - Two-way sync between tasks and GitHub Issues
 
 ## Tech Stack
 
@@ -147,8 +148,7 @@ REDIS_HOST=127.0.0.1
 - [x] ~~Multiple AI provider support~~ (v0.3.0)
 - [x] ~~User authentication~~ (v0.4.0)
 - [x] ~~Version history~~ (v0.5.0)
-- [ ] GitHub Issues export
-- [ ] GitHub OAuth login
+- [x] ~~GitHub Issues integration~~ (v0.6.0)
 - [ ] Team collaboration
 - [ ] Project templates
 - [ ] Diff comparison for versions
