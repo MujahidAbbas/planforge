@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\TasksChanged;
+use App\Listeners\QueueGitHubSync;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,5 +29,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('llm:requests', function ($job) {
             return Limit::perMinute(30)->by('llm:global');
         });
+
+        // Register GitHub sync event listener
+        Event::listen(TasksChanged::class, QueueGitHubSync::class);
     }
 }

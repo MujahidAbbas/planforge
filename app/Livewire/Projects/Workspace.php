@@ -87,6 +87,15 @@ class Workspace extends Component
         unset($this->project);
     }
 
+    /**
+     * Proxy method to handle stale Livewire requests after OAuth redirects.
+     * Dispatches to the child Integrations component.
+     */
+    public function triggerSync(): void
+    {
+        $this->dispatch('triggerSync')->to('projects.tabs.integrations');
+    }
+
     public function render()
     {
         return view('livewire.projects.workspace');

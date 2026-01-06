@@ -12,7 +12,7 @@
     @filamentScripts
     <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <aside class="w-64 bg-gray-900 text-white flex-shrink-0 relative flex flex-col">
+        <aside class="w-64 bg-gray-900 text-white flex-shrink-0 sticky top-0 h-screen flex flex-col">
             <div class="p-4">
                 <a href="{{ route('projects.index') }}" wire:navigate class="flex items-center gap-2">
                     <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

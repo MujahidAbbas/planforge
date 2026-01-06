@@ -117,7 +117,7 @@
 
         <!-- Tabs -->
         <nav class="flex gap-1 mt-4 -mb-px">
-            @foreach(['prd' => 'PRD', 'tech' => 'Tech Spec', 'kanban' => 'Kanban', 'export' => 'Export'] as $key => $label)
+            @foreach(['prd' => 'PRD', 'tech' => 'Tech Spec', 'kanban' => 'Kanban', 'integrations' => 'Integrations', 'export' => 'Export'] as $key => $label)
                 <button
                     wire:click="setTab('{{ $key }}')"
                     @class([
@@ -145,6 +145,10 @@
 
             @case('kanban')
                 <livewire:projects.tabs.kanban-board :project-id="$projectId" :key="'kanban-'.$projectId" />
+                @break
+
+            @case('integrations')
+                <livewire:projects.tabs.integrations :project-id="$projectId" :key="'integrations-'.$projectId" />
                 @break
 
             @case('export')
