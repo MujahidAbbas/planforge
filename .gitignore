@@ -28,6 +28,15 @@ Thumbs.db
 /docs
 /CLAUDE.md
 
+# AI tool configurations
+/.cursor
+/.gemini
+/.junie
+/.mcp.json
+/GEMINI.md
+/boost.json
+
 # SQLite test databases
 planforge_test_*
 planforge
+.env.testing

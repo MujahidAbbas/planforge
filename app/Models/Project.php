@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\IntegrationProvider;
 use App\Enums\ProjectStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -65,5 +66,17 @@ class Project extends Model
     public function latestTaskSet(): ?TaskSet
     {
         return $this->taskSets()->latest()->first();
+    }
+
+    public function integrations(): HasMany
+    {
+        return $this->hasMany(Integration::class);
+    }
+
+    public function gitHubIntegration(): ?Integration
+    {
+        return $this->integrations()
+            ->where('provider', IntegrationProvider::GitHub)
+            ->first();
     }
 }

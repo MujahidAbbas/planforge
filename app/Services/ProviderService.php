@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\AiProvider;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Prism\Prism\Enums\Provider;
 
 class ProviderService
@@ -83,7 +84,7 @@ class ProviderService
         $aiProvider = AiProvider::tryFrom($providerString);
 
         if (! $aiProvider) {
-            \Log::warning("Unknown provider '{$providerString}', falling back to default");
+            Log::warning("Unknown AI provider '{$providerString}', falling back to default");
 
             return $this->getDefaultProviderOrFail()->toPrismProvider();
         }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\GitHubIntegrationController;
+use App\Http\Controllers\GitHubWebhookController;
 use App\Http\Controllers\ProjectExportController;
 use App\Livewire\Actions\Logout;
 use App\Livewire\Projects\Index as ProjectsIndex;
@@ -36,6 +38,31 @@ Route::middleware('auth')->group(function () {
 
         return redirect('/');
     })->name('logout');
+
+    // GitHub Integration
+    Route::prefix('projects/{project}/integrations/github')->group(function () {
+        Route::get('install', [GitHubIntegrationController::class, 'install'])
+            ->name('integrations.github.install');
+        Route::get('select-repo', [GitHubIntegrationController::class, 'selectRepo'])
+            ->name('integrations.github.select-repo');
+        Route::post('setup', [GitHubIntegrationController::class, 'setup'])
+            ->name('integrations.github.setup');
+        Route::delete('disconnect', [GitHubIntegrationController::class, 'disconnect'])
+            ->name('integrations.github.disconnect');
+        Route::post('sync', [GitHubIntegrationController::class, 'sync'])
+            ->name('integrations.github.sync');
+        Route::get('status', [GitHubIntegrationController::class, 'syncStatus'])
+            ->name('integrations.github.status');
+    });
 });
+
+// GitHub callback - runs without auth since it's called by GitHub
+Route::get('integrations/github/callback', [GitHubIntegrationController::class, 'callback'])
+    ->name('integrations.github.callback');
+
+// GitHub webhook - no CSRF, no auth - handles incoming webhooks from GitHub
+Route::post('webhooks/github', [GitHubWebhookController::class, 'handle'])
+    ->name('webhooks.github')
+    ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
 
 require __DIR__.'/auth.php';

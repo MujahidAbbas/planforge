@@ -20,6 +20,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Prism\Prism\Enums\Provider;
 use Prism\Prism\Exceptions\PrismRateLimitedException;
 use Prism\Prism\Facades\Prism;
 use Relaticle\Flowforge\Services\Rank;
@@ -80,6 +82,11 @@ class GenerateTasksJob implements ShouldBeUnique, ShouldQueue
                 ?? $this->truncate($prdDoc?->currentVersion?->content_md, 2000);
 
             $response = $this->callAI($run, $techSpec, $prdSummary);
+
+            Log::info('Task generation completed', [
+                'project_id' => $run->project_id,
+                'tasks_count' => count($response->structured['tasks'] ?? []),
+            ]);
 
             $this->storeRateLimits($step, $response);
             $this->persistTasks($run->project_id, $taskSet, $response->structured);
