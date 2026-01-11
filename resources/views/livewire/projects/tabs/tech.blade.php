@@ -84,11 +84,11 @@
         </div>
     @else
         <div class="flex-1 bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <textarea
-                wire:model.live.debounce.500ms="content"
-                class="w-full h-full p-4 resize-none border-0 focus:ring-0 font-mono text-sm"
+            <x-markdown-editor
+                :content="$content"
+                :editorMode="$editorMode"
                 placeholder="# Technical Specification&#10;&#10;## Architecture&#10;Describe your system architecture..."
-            ></textarea>
+            />
         </div>
     @endif
 

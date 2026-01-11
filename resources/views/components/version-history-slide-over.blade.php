@@ -5,6 +5,8 @@
     'currentVersionId' => null,
 ])
 
+@inject('markdown', 'App\Services\MarkdownService')
+
 <div
     x-data="{ show: @entangle('showVersionHistory').live }"
     x-show="show"
@@ -173,7 +175,15 @@
 
                             {{-- Preview Content --}}
                             <div class="flex-1 overflow-y-auto p-6">
-                                <pre class="whitespace-pre-wrap font-mono text-sm text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200">{{ $selectedVersion->content_md }}</pre>
+                                <div
+                                    x-data="codeBlockEnhancer()"
+                                    x-init="$nextTick(() => enhance())"
+                                    class="prose prose-sm max-w-none prose-headings:font-semibold prose-a:text-indigo-600 markdown-preview"
+                                    wire:key="version-preview-{{ $selectedVersion->id }}"
+                                    wire:ignore.self
+                                >
+                                    {!! $markdown->render($selectedVersion->content_md) !!}
+                                </div>
                             </div>
                         @else
                             {{-- Empty state --}}
