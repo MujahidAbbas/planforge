@@ -29,6 +29,19 @@ class TemplateSelector extends Component
         $project = Project::findOrFail($projectId);
         $fieldName = $documentType === 'prd' ? 'prd_template_id' : 'tech_template_id';
         $this->selectedTemplateId = $project->{$fieldName};
+
+        // If no template selected, use user's default template
+        if (! $this->selectedTemplateId) {
+            $user = auth()->user();
+            $defaultField = $documentType === 'prd' ? 'default_prd_template_id' : 'default_tech_template_id';
+            $defaultTemplateId = $user->{$defaultField};
+
+            if ($defaultTemplateId) {
+                $this->selectedTemplateId = $defaultTemplateId;
+                // Also update the project with the default
+                $project->update([$fieldName => $defaultTemplateId]);
+            }
+        }
     }
 
     #[Computed]
