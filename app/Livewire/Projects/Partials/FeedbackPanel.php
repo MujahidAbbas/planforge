@@ -105,7 +105,7 @@ class FeedbackPanel extends Component
         $this->isLoading = false;
     }
 
-    public function render()
+    public function render(): \Illuminate\View\View
     {
         return view('livewire.projects.partials.feedback-panel');
     }

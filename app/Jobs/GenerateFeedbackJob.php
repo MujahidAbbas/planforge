@@ -20,6 +20,7 @@ class GenerateFeedbackJob implements ShouldQueue
 
     public int $tries = 3;
 
+    /** @var array<int, int> */
     public array $backoff = [10, 30, 60];
 
     public function __construct(
@@ -30,6 +31,9 @@ class GenerateFeedbackJob implements ShouldQueue
         $this->afterCommit();
     }
 
+    /**
+     * @return array<int, object>
+     */
     public function middleware(): array
     {
         return [new RateLimited('llm:requests')];
@@ -40,30 +44,23 @@ class GenerateFeedbackJob implements ShouldQueue
         $document = Document::with(['currentVersion', 'project'])->findOrFail($this->documentId);
         $project = $document->project;
 
-        // Get content
-        $content = $document->currentVersion->content_md;
-        $documentType = $document->type->label();
-
-        // Build prompts
         $system = view('prompts.feedback.system')->render();
         $prompt = view("prompts.feedback.{$this->feedbackType->value}", [
-            'content' => $content,
-            'documentType' => strtolower($documentType),
+            'content' => $document->currentVersion->content_md,
+            'documentType' => strtolower($document->type->label()),
         ])->render();
 
-        // Resolve AI provider
-        $providerEnum = $this->resolveProvider($project->preferred_provider ?? 'anthropic');
+        $provider = $this->resolveProvider($project->preferred_provider ?? 'anthropic');
+        $model = $project->preferred_model ?? 'claude-sonnet-4-20250514';
 
-        // Generate feedback
         $response = Prism::text()
-            ->using($providerEnum, $project->preferred_model ?? 'claude-sonnet-4-20250514')
+            ->using($provider, $model)
             ->withMaxTokens(2000)
             ->withSystemPrompt($system)
             ->withPrompt($prompt)
             ->withClientOptions(['timeout' => 60])
             ->asText();
 
-        // Cache the result for 1 hour
         Cache::put($this->cacheKey, [
             'feedback' => $response->text,
             'type' => $this->feedbackType->value,

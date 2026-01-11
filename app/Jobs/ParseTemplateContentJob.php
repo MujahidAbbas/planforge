@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Jobs\Concerns\ResolvesAiProvider;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -10,15 +9,16 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use Prism\Prism\Enums\Provider;
 use Prism\Prism\Facades\Prism;
-use Prism\Prism\Providers\ProviderEnum;
 
 class ParseTemplateContentJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, ResolvesAiProvider, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
 
+    /** @var array<int, int> */
     public array $backoff = [10, 30, 60];
 
     public function __construct(
@@ -28,6 +28,9 @@ class ParseTemplateContentJob implements ShouldQueue
         $this->afterCommit();
     }
 
+    /**
+     * @return array<int, object>
+     */
     public function middleware(): array
     {
         return [new RateLimited('llm:requests')];
@@ -35,53 +38,74 @@ class ParseTemplateContentJob implements ShouldQueue
 
     public function handle(): void
     {
-        // Build prompts
         $system = view('prompts.template-parser.system')->render();
-        $prompt = view('prompts.template-parser.user', [
-            'content' => $this->content,
-        ])->render();
+        $prompt = view('prompts.template-parser.user', ['content' => $this->content])->render();
 
-        // Generate parsed structure using Anthropic
         $response = Prism::text()
-            ->using(ProviderEnum::Anthropic, 'claude-sonnet-4-20250514')
+            ->using(Provider::Anthropic, 'claude-sonnet-4-20250514')
             ->withMaxTokens(2000)
             ->withSystemPrompt($system)
             ->withPrompt($prompt)
             ->withClientOptions(['timeout' => 60])
             ->asText();
 
-        // Parse JSON response
-        $text = $response->text;
+        $parsed = $this->parseResponse($response->text);
 
-        // Extract JSON from response (handle markdown code blocks)
-        if (preg_match('/```(?:json)?\s*([\s\S]*?)```/', $text, $matches)) {
-            $text = trim($matches[1]);
-        }
+        Cache::put($this->cacheKey, $parsed, now()->addMinutes(30));
+    }
 
+    /**
+     * @return array{name: string, description: string, sections: array<int, array{title: string, description: string}>}
+     */
+    private function parseResponse(string $text): array
+    {
+        $text = $this->extractJsonFromMarkdown($text);
         $parsed = json_decode($text, true);
 
-        // Ensure valid structure
         if (! is_array($parsed)) {
-            $parsed = [
-                'name' => 'Parsed Template',
-                'description' => '',
-                'sections' => [],
-            ];
+            return $this->defaultStructure();
         }
 
-        // Normalize sections
-        if (isset($parsed['sections']) && is_array($parsed['sections'])) {
-            $parsed['sections'] = array_map(function ($section) {
-                return [
-                    'title' => $section['title'] ?? '',
-                    'description' => $section['description'] ?? '',
-                ];
-            }, $parsed['sections']);
-        } else {
-            $parsed['sections'] = [];
+        return [
+            'name' => $parsed['name'] ?? 'Parsed Template',
+            'description' => $parsed['description'] ?? '',
+            'sections' => $this->normalizeSections($parsed['sections'] ?? []),
+        ];
+    }
+
+    private function extractJsonFromMarkdown(string $text): string
+    {
+        if (preg_match('/```(?:json)?\s*([\s\S]*?)```/', $text, $matches)) {
+            return trim($matches[1]);
         }
 
-        // Cache the result for 30 minutes
-        Cache::put($this->cacheKey, $parsed, now()->addMinutes(30));
+        return $text;
+    }
+
+    /**
+     * @return array<int, array{title: string, description: string}>
+     */
+    private function normalizeSections(mixed $sections): array
+    {
+        if (! is_array($sections)) {
+            return [];
+        }
+
+        return array_map(fn (array $section): array => [
+            'title' => $section['title'] ?? '',
+            'description' => $section['description'] ?? '',
+        ], $sections);
+    }
+
+    /**
+     * @return array{name: string, description: string, sections: array<int, mixed>}
+     */
+    private function defaultStructure(): array
+    {
+        return [
+            'name' => 'Parsed Template',
+            'description' => '',
+            'sections' => [],
+        ];
     }
 }

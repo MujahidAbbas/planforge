@@ -6,6 +6,7 @@ use App\Enums\DocumentType;
 use App\Jobs\ParseTemplateContentJob;
 use App\Models\Template;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -13,29 +14,25 @@ use Livewire\Component;
 #[Layout('components.layouts.app')]
 class Create extends Component
 {
-    // Wizard state
     public int $currentStep = 1;
 
-    public ?string $mode = null; // 'paste' or 'manual'
+    public ?string $mode = null;
 
-    // Paste mode
     public string $pastedContent = '';
 
     public bool $isParsing = false;
 
-    // Template form fields
     #[Validate('required|max:255')]
     public string $name = '';
 
     public string $description = '';
 
-    public string $instructions = ''; // maps to ai_instructions
+    public string $instructions = '';
 
     public string $documentType = 'prd';
 
     public array $sections = [];
 
-    // Preview modal
     public bool $showPreview = false;
 
     public function selectMethod(string $method): void
@@ -44,7 +41,6 @@ class Create extends Component
         $this->currentStep = 2;
 
         if ($method === 'manual') {
-            // Start with one empty section
             $this->sections = [
                 ['title' => '', 'description' => ''],
             ];
@@ -63,32 +59,29 @@ class Create extends Component
         $this->validate(['pastedContent' => 'required|min:50']);
         $this->isParsing = true;
 
-        ParseTemplateContentJob::dispatch(
-            $this->pastedContent,
-            $this->getCacheKey()
-        );
+        ParseTemplateContentJob::dispatch($this->pastedContent, $this->cacheKey());
     }
 
     public function checkParseResult(): void
     {
-        $result = Cache::get($this->getCacheKey());
+        $result = Cache::get($this->cacheKey());
 
-        if ($result) {
-            $this->name = $result['name'] ?? '';
-            $this->description = $result['description'] ?? '';
-            $this->sections = $result['sections'] ?? [];
-            $this->isParsing = false;
-            $this->mode = 'manual'; // Switch to editor mode
-            Cache::forget($this->getCacheKey());
+        if (! $result) {
+            return;
         }
+
+        $this->name = $result['name'] ?? '';
+        $this->description = $result['description'] ?? '';
+        $this->sections = $result['sections'] ?? [];
+        $this->isParsing = false;
+        $this->mode = 'manual';
+
+        Cache::forget($this->cacheKey());
     }
 
     public function addSection(): void
     {
-        $this->sections[] = [
-            'title' => '',
-            'description' => '',
-        ];
+        $this->sections[] = ['title' => '', 'description' => ''];
     }
 
     public function removeSection(int $index): void
@@ -102,18 +95,16 @@ class Create extends Component
         $oldIndex = (int) $oldIndex;
         $newIndex = (int) $newIndex;
 
-        // Get the section being moved
         $section = $this->sections[$oldIndex] ?? null;
+
         if (! $section) {
             return;
         }
 
-        // Remove from old position
         $sections = $this->sections;
         unset($sections[$oldIndex]);
         $sections = array_values($sections);
 
-        // Insert at new position
         array_splice($sections, $newIndex, 0, [$section]);
 
         $this->sections = $sections;
@@ -137,8 +128,9 @@ class Create extends Component
             'sections.*.title' => 'required|string|max:255',
         ]);
 
-        // Filter out empty sections
-        $sections = array_filter($this->sections, fn ($s) => ! empty($s['title']));
+        $sections = array_values(
+            array_filter($this->sections, fn (array $section): bool => ! empty($section['title']))
+        );
 
         Template::create([
             'user_id' => auth()->id(),
@@ -146,7 +138,7 @@ class Create extends Component
             'description' => $this->description ?: null,
             'document_type' => DocumentType::from($this->documentType),
             'ai_instructions' => $this->instructions ?: null,
-            'sections' => array_values($sections),
+            'sections' => $sections,
             'is_built_in' => false,
             'is_public' => false,
         ]);
@@ -155,13 +147,13 @@ class Create extends Component
         $this->redirect(route('templates.index'), navigate: true);
     }
 
-    private function getCacheKey(): string
-    {
-        return 'template-parse:'.auth()->id().':'.md5($this->pastedContent);
-    }
-
-    public function render()
+    public function render(): View
     {
         return view('livewire.templates.create');
+    }
+
+    private function cacheKey(): string
+    {
+        return 'template-parse:'.auth()->id().':'.md5($this->pastedContent);
     }
 }

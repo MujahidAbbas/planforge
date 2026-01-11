@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection as SupportCollection;
 
 class Template extends Model
 {
@@ -84,11 +85,11 @@ class Template extends Model
     /**
      * Get templates grouped by category for UI display.
      */
-    public static function getGroupedByCategory(DocumentType $type, ?string $userId = null): \Illuminate\Support\Collection
+    public static function getGroupedByCategory(DocumentType $type, ?string $userId = null): SupportCollection
     {
         return static::getAvailable($type, $userId)
-            ->groupBy(fn ($template) => $template->category?->value ?? 'other')
-            ->map(fn ($templates, $category) => [
+            ->groupBy(fn (Template $template): string => $template->category?->value ?? 'other')
+            ->map(fn (Collection $templates, string $category): array => [
                 'category' => TemplateCategory::tryFrom($category),
                 'templates' => $templates,
             ]);

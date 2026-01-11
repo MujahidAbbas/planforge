@@ -28,9 +28,10 @@ class GenerateTechSpecJob implements ShouldBeUnique, ShouldQueue
 
     public int $tries = 5;
 
+    /** @var array<int, int> */
     public array $backoff = [10, 30, 60, 120, 300];
 
-    public int $uniqueFor = 3600; // 1 hour
+    public int $uniqueFor = 3600;
 
     public function __construct(public string $planRunId)
     {
@@ -42,6 +43,9 @@ class GenerateTechSpecJob implements ShouldBeUnique, ShouldQueue
         return $this->planRunId.':tech';
     }
 
+    /**
+     * @return array<int, object>
+     */
     public function middleware(): array
     {
         return [new RateLimited('llm:requests')];

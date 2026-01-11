@@ -4,7 +4,9 @@ namespace App\Livewire\Templates;
 
 use App\Enums\DocumentType;
 use App\Models\Template;
-use Illuminate\Support\Collection;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -17,7 +19,8 @@ class Index extends Component
     #[Computed]
     public function customTemplates(): Collection
     {
-        return Template::where('user_id', auth()->id())
+        return Template::query()
+            ->where('user_id', auth()->id())
             ->orderBy('name')
             ->get();
     }
@@ -25,7 +28,8 @@ class Index extends Component
     #[Computed]
     public function builtInTemplates(): Collection
     {
-        return Template::where('is_built_in', true)
+        return Template::query()
+            ->where('is_built_in', true)
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
@@ -34,9 +38,11 @@ class Index extends Component
     #[Computed]
     public function previewTemplate(): ?Template
     {
-        return $this->previewTemplateId
-            ? Template::find($this->previewTemplateId)
-            : null;
+        if (! $this->previewTemplateId) {
+            return null;
+        }
+
+        return Template::find($this->previewTemplateId);
     }
 
     public function preview(string $templateId): void
@@ -52,44 +58,56 @@ class Index extends Component
     public function makeDefault(string $templateId): void
     {
         $template = Template::findOrFail($templateId);
-        $field = $template->document_type === DocumentType::Prd
-            ? 'default_prd_template_id'
-            : 'default_tech_template_id';
+        $field = $this->defaultTemplateField($template->document_type);
 
         auth()->user()->update([$field => $templateId]);
     }
 
     public function clearDefault(string $documentType): void
     {
-        $field = $documentType === 'prd'
-            ? 'default_prd_template_id'
-            : 'default_tech_template_id';
+        $field = $this->defaultTemplateField(DocumentType::from($documentType));
 
         auth()->user()->update([$field => null]);
     }
 
     public function deleteTemplate(string $templateId): void
     {
-        $template = Template::where('id', $templateId)
+        $template = Template::query()
+            ->where('id', $templateId)
             ->where('user_id', auth()->id())
             ->first();
 
-        if ($template) {
-            // Clear default if this template was set as default
-            $user = auth()->user();
-            if ($user->default_prd_template_id === $templateId) {
-                $user->update(['default_prd_template_id' => null]);
-            }
-            if ($user->default_tech_template_id === $templateId) {
-                $user->update(['default_tech_template_id' => null]);
-            }
-
-            $template->delete();
+        if (! $template) {
+            return;
         }
+
+        $this->clearDefaultIfMatches($templateId);
+        $template->delete();
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.templates.index');
+    }
+
+    private function defaultTemplateField(DocumentType $type): string
+    {
+        return $type === DocumentType::Prd
+            ? 'default_prd_template_id'
+            : 'default_tech_template_id';
+    }
+
+    private function clearDefaultIfMatches(string $templateId): void
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        if ($user->default_prd_template_id === $templateId) {
+            $user->update(['default_prd_template_id' => null]);
+        }
+
+        if ($user->default_tech_template_id === $templateId) {
+            $user->update(['default_tech_template_id' => null]);
+        }
     }
 }

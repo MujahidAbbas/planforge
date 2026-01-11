@@ -7,6 +7,8 @@ use App\Models\Project;
 use App\Models\Template;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -25,39 +27,24 @@ class TemplateSelector extends Component
         $this->projectId = $projectId;
         $this->documentType = $documentType;
 
-        // Load current selection from project
         $project = Project::findOrFail($projectId);
-        $fieldName = $documentType === 'prd' ? 'prd_template_id' : 'tech_template_id';
-        $this->selectedTemplateId = $project->{$fieldName};
+        $this->selectedTemplateId = $project->{$this->templateField()};
 
-        // If no template selected, use user's default template
         if (! $this->selectedTemplateId) {
-            $user = auth()->user();
-            $defaultField = $documentType === 'prd' ? 'default_prd_template_id' : 'default_tech_template_id';
-            $defaultTemplateId = $user->{$defaultField};
-
-            if ($defaultTemplateId) {
-                $this->selectedTemplateId = $defaultTemplateId;
-                // Also update the project with the default
-                $project->update([$fieldName => $defaultTemplateId]);
-            }
+            $this->applyUserDefaultTemplate($project);
         }
     }
 
     #[Computed]
     public function templates(): Collection
     {
-        $type = DocumentType::from($this->documentType);
-
-        return Template::getAvailable($type, auth()->id());
+        return Template::getAvailable($this->documentTypeEnum(), auth()->id());
     }
 
     #[Computed]
-    public function groupedTemplates(): \Illuminate\Support\Collection
+    public function groupedTemplates(): SupportCollection
     {
-        $type = DocumentType::from($this->documentType);
-
-        return Template::getGroupedByCategory($type, auth()->id());
+        return Template::getGroupedByCategory($this->documentTypeEnum(), auth()->id());
     }
 
     #[Computed]
@@ -82,10 +69,7 @@ class TemplateSelector extends Component
         $this->authorize('update', $project);
 
         $this->selectedTemplateId = $templateId;
-
-        // Update project
-        $fieldName = $this->documentType === 'prd' ? 'prd_template_id' : 'tech_template_id';
-        $project->update([$fieldName => $templateId]);
+        $project->update([$this->templateField() => $templateId]);
 
         $this->dispatch('template-selected', templateId: $templateId);
     }
@@ -96,15 +80,38 @@ class TemplateSelector extends Component
         $this->authorize('update', $project);
 
         $this->selectedTemplateId = null;
-
-        $fieldName = $this->documentType === 'prd' ? 'prd_template_id' : 'tech_template_id';
-        $project->update([$fieldName => null]);
+        $project->update([$this->templateField() => null]);
 
         $this->dispatch('template-cleared');
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.projects.partials.template-selector');
+    }
+
+    private function templateField(): string
+    {
+        return $this->documentType === 'prd' ? 'prd_template_id' : 'tech_template_id';
+    }
+
+    private function defaultTemplateField(): string
+    {
+        return $this->documentType === 'prd' ? 'default_prd_template_id' : 'default_tech_template_id';
+    }
+
+    private function documentTypeEnum(): DocumentType
+    {
+        return DocumentType::from($this->documentType);
+    }
+
+    private function applyUserDefaultTemplate(Project $project): void
+    {
+        $defaultTemplateId = auth()->user()->{$this->defaultTemplateField()};
+
+        if ($defaultTemplateId) {
+            $this->selectedTemplateId = $defaultTemplateId;
+            $project->update([$this->templateField() => $defaultTemplateId]);
+        }
     }
 }
