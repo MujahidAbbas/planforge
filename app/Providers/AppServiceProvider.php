@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\TasksChanged;
 use App\Listeners\QueueGitHubSync;
+use App\Services\MarkdownService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
@@ -16,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(MarkdownService::class);
     }
 
     /**

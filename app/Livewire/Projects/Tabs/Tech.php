@@ -5,6 +5,7 @@ namespace App\Livewire\Projects\Tabs;
 use App\Actions\GenerateTasksFromTechSpec;
 use App\Enums\DocumentType;
 use App\Enums\PlanRunStepStatus;
+use App\Livewire\Concerns\HasMarkdownPreview;
 use App\Livewire\Concerns\HasVersionHistory;
 use App\Models\Document;
 use App\Models\DocumentVersion;
@@ -18,6 +19,7 @@ use Livewire\Component;
 class Tech extends Component
 {
     use AuthorizesRequests;
+    use HasMarkdownPreview;
     use HasVersionHistory;
 
     public string $projectId;
@@ -55,6 +57,7 @@ class Tech extends Component
     public function updatedContent(): void
     {
         $this->isDirty = true;
+        $this->clearPreviewCache();
     }
 
     public function save(): void

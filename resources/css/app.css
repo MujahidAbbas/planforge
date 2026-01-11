@@ -1,6 +1,98 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* Highlight.js theme for syntax highlighting */
+@import 'highlight.js/styles/github-dark.css';
 
 @source '../views/**/*.blade.php';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+
+/* Markdown Preview Styling */
+.markdown-preview {
+    /* Inline code - pink on light gray */
+    & :not(pre) > code {
+        @apply text-pink-600 bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono;
+    }
+
+    /* Remove the backtick quotes from inline code */
+    & :not(pre) > code::before,
+    & :not(pre) > code::after {
+        content: none;
+    }
+
+    /* Code blocks container */
+    & pre {
+        @apply bg-gray-900 rounded-lg overflow-x-auto relative;
+    }
+
+    /* Code block content - let highlight.js handle colors */
+    & pre code {
+        @apply bg-transparent p-4 text-sm leading-relaxed block;
+    }
+
+    /* Code block header with language label and copy button */
+    & .code-block-header {
+        @apply flex justify-between items-center px-4 py-2
+               bg-gray-800 border-b border-gray-700
+               text-xs text-gray-400 rounded-t-lg;
+    }
+
+    & .code-language {
+        @apply font-medium tracking-wide;
+    }
+
+    & .copy-btn {
+        @apply px-2.5 py-1 rounded text-gray-400
+               hover:text-white hover:bg-gray-700
+               transition-colors duration-150 cursor-pointer
+               border-0 bg-transparent;
+    }
+
+    & .copy-btn.copied {
+        @apply text-green-400;
+    }
+
+    /* When header exists, adjust code padding */
+    & pre:has(.code-block-header) {
+        @apply rounded-t-none;
+    }
+
+    & pre:has(.code-block-header) code {
+        @apply rounded-t-none;
+    }
+
+    /* Tables - clean borders */
+    & table {
+        @apply w-full border-collapse;
+    }
+
+    & th {
+        @apply bg-gray-50 font-semibold text-left px-4 py-2 border border-gray-200;
+    }
+
+    & td {
+        @apply px-4 py-2 border border-gray-200;
+    }
+
+    /* Task lists */
+    & input[type="checkbox"] {
+        @apply rounded border-gray-300 text-indigo-600 mr-2;
+    }
+
+    /* Blockquotes */
+    & blockquote {
+        @apply border-l-4 border-indigo-500 bg-indigo-50 pl-4 py-2 italic text-gray-700;
+    }
+
+    /* Horizontal rules */
+    & hr {
+        @apply border-gray-200 my-8;
+    }
+
+    /* Images */
+    & img {
+        @apply rounded-lg shadow-sm;
+    }
+}
