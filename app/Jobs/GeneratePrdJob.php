@@ -68,9 +68,15 @@ class GeneratePrdJob implements ShouldBeUnique, ShouldQueue
         ]);
 
         try {
+            // Load template if set
+            $template = $run->project->prdTemplate;
+
             $providerEnum = $this->resolveProvider($run->provider);
             $system = view('prompts.prd.system')->render();
-            $prompt = view('prompts.prd.user', ['project' => $run->project])->render();
+            $prompt = view('prompts.prd.user', [
+                'project' => $run->project,
+                'template' => $template,
+            ])->render();
 
             $response = Prism::text()
                 ->using($providerEnum, $run->model)
@@ -108,6 +114,11 @@ class GeneratePrdJob implements ShouldBeUnique, ShouldQueue
 
             // Point document to new version
             $doc->update(['current_version_id' => $version->id]);
+
+            // Record template usage
+            if ($template) {
+                $template->recordUsage();
+            }
 
             // Mark step as succeeded
             $step->update([

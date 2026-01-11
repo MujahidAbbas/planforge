@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\IntegrationProvider;
 use App\Enums\ProjectStatus;
+use App\Models\Template;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,8 @@ class Project extends Model
         'constraints',
         'preferred_provider',
         'preferred_model',
+        'prd_template_id',
+        'tech_template_id',
         'status',
     ];
 
@@ -78,5 +81,15 @@ class Project extends Model
         return $this->integrations()
             ->where('provider', IntegrationProvider::GitHub)
             ->first();
+    }
+
+    public function prdTemplate(): BelongsTo
+    {
+        return $this->belongsTo(Template::class, 'prd_template_id');
+    }
+
+    public function techTemplate(): BelongsTo
+    {
+        return $this->belongsTo(Template::class, 'tech_template_id');
     }
 }

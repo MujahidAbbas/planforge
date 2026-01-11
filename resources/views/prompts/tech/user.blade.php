@@ -22,4 +22,17 @@ Please create a Technical Specification document based on the following PRD:
 
 ---
 
+@if($template && count($template->sections) > 0)
+## Document Structure
+
+Please structure the Technical Specification with the following sections:
+
+{!! $template->getFormattedSectionsForPrompt() !!}
+
+@if($template->ai_instructions)
+## Additional Instructions
+{{ $template->ai_instructions }}
+@endif
+
+@endif
 Based on the above PRD, please generate a complete Technical Specification in markdown format that provides a clear implementation roadmap for developers.
