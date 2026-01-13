@@ -78,11 +78,11 @@
     @else
         {{-- Editor --}}
         <div class="flex-1 bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <textarea
-                wire:model.live.debounce.500ms="content"
-                class="w-full h-full p-4 resize-none border-0 focus:ring-0 font-mono text-sm"
+            <x-markdown-editor
+                :content="$content"
+                :editorMode="$editorMode"
                 placeholder="# Product Requirements Document&#10;&#10;## Overview&#10;Describe your product..."
-            ></textarea>
+            />
         </div>
     @endif
 

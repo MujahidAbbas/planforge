@@ -15,6 +15,7 @@ PlanForge is a self-hosted project planning tool that uses AI to generate compre
 - **Tech Spec Generation** - Detailed technical specifications based on the PRD
 - **Task Generation** - Break down tech specs into actionable development tasks
 - **Version History** - Browse, preview, and restore previous document versions
+- **Markdown Preview** - Write/Preview/Split editor modes with syntax highlighting
 - **Kanban Board** - Drag-and-drop task management with Flowforge
 - **User Authentication** - Secure login with email/password
 - **Regeneration** - Regenerate individual documents or the entire pipeline
@@ -149,6 +150,7 @@ REDIS_HOST=127.0.0.1
 - [x] ~~User authentication~~ (v0.4.0)
 - [x] ~~Version history~~ (v0.5.0)
 - [x] ~~GitHub Issues integration~~ (v0.6.0)
+- [x] ~~Markdown preview with syntax highlighting~~ (v0.7.0)
 - [ ] Team collaboration
 - [ ] Project templates
 - [ ] Diff comparison for versions
