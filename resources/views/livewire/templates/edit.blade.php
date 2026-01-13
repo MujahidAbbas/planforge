@@ -34,7 +34,7 @@
                         type="text"
                         wire:model="name"
                         placeholder="Enter template title..."
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                     @error('name')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -48,7 +48,7 @@
                         wire:model="description"
                         placeholder="Describe what this template is for and how it should be used..."
                         rows="4"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
+                        class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
                     ></textarea>
                 </div>
 
@@ -59,7 +59,7 @@
                         wire:model="instructions"
                         placeholder="Provide instructions on how to use this template..."
                         rows="4"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
+                        class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
                     ></textarea>
                     <p class="mt-1 text-sm text-gray-500">These instructions will guide the AI when generating documents with this template.</p>
                 </div>
@@ -84,58 +84,62 @@
                         <span class="text-sm text-gray-500">{{ count($sections) }} {{ Str::plural('section', count($sections)) }}</span>
                     </div>
 
-                    <div class="space-y-4" x-data x-sortable="reorderSection">
+                    <div class="space-y-5" x-data x-sortable="reorderSection">
                         @foreach($sections as $index => $section)
                             <div
                                 wire:key="section-{{ $index }}"
-                                class="relative bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                                class="relative bg-white border border-gray-200 rounded-2xl p-5"
                             >
-                                {{-- Drag Handle --}}
-                                <div data-sortable-handle class="absolute left-3 top-4 cursor-grab text-gray-400 hover:text-gray-600">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <circle cx="9" cy="5" r="1.5"/>
-                                        <circle cx="9" cy="12" r="1.5"/>
-                                        <circle cx="9" cy="19" r="1.5"/>
-                                        <circle cx="15" cy="5" r="1.5"/>
-                                        <circle cx="15" cy="12" r="1.5"/>
-                                        <circle cx="15" cy="19" r="1.5"/>
-                                    </svg>
-                                </div>
-
-                                {{-- Delete Button --}}
+                                {{-- Delete Button - top right corner --}}
                                 <button
                                     wire:click="removeSection({{ $index }})"
-                                    class="absolute -right-2 -top-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition shadow-sm"
+                                    class="absolute text-white rounded-full flex items-center justify-center transition shadow-md hover:opacity-90"
+                                    style="top: 12px; right: 12px; width: 28px; height: 28px; background-color: #ec4899;"
                                 >
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
                                 </button>
 
-                                <div class="pl-8 space-y-4">
-                                    {{-- Section Title --}}
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
-                                        <input
-                                            type="text"
-                                            wire:model="sections.{{ $index }}.title"
-                                            placeholder="Enter section title..."
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                        />
-                                        @error("sections.{$index}.title")
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
+                                <div class="flex gap-3 pr-10">
+                                    {{-- Drag Handle --}}
+                                    <div data-sortable-handle class="flex-shrink-0 pt-1 cursor-grab text-gray-400 hover:text-gray-600">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <circle cx="9" cy="6" r="1.5"/>
+                                            <circle cx="9" cy="12" r="1.5"/>
+                                            <circle cx="9" cy="18" r="1.5"/>
+                                            <circle cx="15" cy="6" r="1.5"/>
+                                            <circle cx="15" cy="12" r="1.5"/>
+                                            <circle cx="15" cy="18" r="1.5"/>
+                                        </svg>
                                     </div>
 
-                                    {{-- Section Description --}}
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Section Description</label>
-                                        <textarea
-                                            wire:model="sections.{{ $index }}.description"
-                                            placeholder="Describe what this section should contain..."
-                                            rows="3"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
-                                        ></textarea>
+                                    {{-- Section Content --}}
+                                    <div class="flex-1 space-y-4">
+                                        {{-- Section Title --}}
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-900 mb-2">Section Title</label>
+                                            <input
+                                                type="text"
+                                                wire:model="sections.{{ $index }}.title"
+                                                placeholder="Enter section title..."
+                                                class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                            />
+                                            @error("sections.{$index}.title")
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        {{-- Section Description --}}
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-900 mb-2">Section Description</label>
+                                            <textarea
+                                                wire:model="sections.{{ $index }}.description"
+                                                placeholder="Describe what this section should contain..."
+                                                rows="4"
+                                                class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
+                                            ></textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
