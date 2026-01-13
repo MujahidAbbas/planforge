@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ab53984dc2e43392e17f25cd02aca89e",
+    "content-hash": "e22e30daf1f2bf93850194e308aa2fa2",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -5207,19 +5207,20 @@
         },
         {
             "name": "relaticle/flowforge",
-            "version": "v2.2.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Relaticle/flowforge.git",
-                "reference": "fc39ac8656f63a40f7f543f31ba9a171f3486759"
+                "reference": "9a6a9835aed99b1b2435d5ec717cf3f69d82e4df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Relaticle/flowforge/zipball/fc39ac8656f63a40f7f543f31ba9a171f3486759",
-                "reference": "fc39ac8656f63a40f7f543f31ba9a171f3486759",
+                "url": "https://api.github.com/repos/Relaticle/flowforge/zipball/9a6a9835aed99b1b2435d5ec717cf3f69d82e4df",
+                "reference": "9a6a9835aed99b1b2435d5ec717cf3f69d82e4df",
                 "shasum": ""
             },
             "require": {
+                "ext-bcmath": "*",
                 "filament/filament": "^4.0",
                 "php": "^8.3",
                 "spatie/laravel-package-tools": "^1.15.0"
@@ -5228,7 +5229,7 @@
                 "larastan/larastan": "^3.0",
                 "laravel/pint": "^1.0",
                 "nunomaduro/collision": "^8.0",
-                "orchestra/testbench": "^9.0",
+                "orchestra/testbench": "^10.0",
                 "pestphp/pest": "^4.0",
                 "pestphp/pest-plugin-arch": "^4.0",
                 "pestphp/pest-plugin-laravel": "^4.0",
@@ -5283,7 +5284,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-13T20:39:16+00:00"
+            "time": "2026-01-11T20:27:33+00:00"
         },
         {
             "name": "ryangjchandler/blade-capture-directive",

@@ -18,7 +18,7 @@ use App\Models\Story;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Relaticle\Flowforge\Services\Rank;
+use Relaticle\Flowforge\Services\DecimalPosition;
 
 class DatabaseSeeder extends Seeder
 {
@@ -117,10 +117,10 @@ class DatabaseSeeder extends Seeder
             'sort_order' => 0,
         ]);
 
-        // Generate lexicographic positions for Flowforge
-        $rank1 = Rank::forEmptySequence();
-        $rank2 = Rank::after($rank1);
-        $rank3 = Rank::after($rank2);
+        // Generate decimal positions for Flowforge
+        $position1 = DecimalPosition::forEmptyColumn();
+        $position2 = DecimalPosition::after($position1);
+        $position3 = DecimalPosition::after($position2);
 
         Task::create([
             'project_id' => $project->id,
@@ -133,7 +133,7 @@ class DatabaseSeeder extends Seeder
             'estimate' => '2h',
             'labels' => ['backend', 'database'],
             'status' => TaskStatus::Done,
-            'position' => $rank1->get(),
+            'position' => $position1,
         ]);
 
         Task::create([
@@ -147,7 +147,7 @@ class DatabaseSeeder extends Seeder
             'estimate' => '3h',
             'labels' => ['frontend', 'livewire'],
             'status' => TaskStatus::Doing,
-            'position' => $rank2->get(),
+            'position' => $position2,
         ]);
 
         Task::create([
@@ -158,7 +158,7 @@ class DatabaseSeeder extends Seeder
             'estimate' => '4h',
             'labels' => ['frontend', 'ux'],
             'status' => TaskStatus::Todo,
-            'position' => $rank3->get(),
+            'position' => $position3,
         ]);
     }
 }
