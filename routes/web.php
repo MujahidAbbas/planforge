@@ -6,6 +6,9 @@ use App\Http\Controllers\ProjectExportController;
 use App\Livewire\Actions\Logout;
 use App\Livewire\Projects\Index as ProjectsIndex;
 use App\Livewire\Projects\Workspace;
+use App\Livewire\Templates\Create as TemplatesCreate;
+use App\Livewire\Templates\Edit as TemplatesEdit;
+use App\Livewire\Templates\Index as TemplatesIndex;
 use Illuminate\Support\Facades\Route;
 
 // Welcome page redirects based on auth status
@@ -22,6 +25,11 @@ Route::middleware('auth')->group(function () {
     // Projects
     Route::get('/projects', ProjectsIndex::class)->name('projects.index');
     Route::get('/projects/{project}', Workspace::class)->name('projects.workspace');
+
+    // Templates
+    Route::get('/templates', TemplatesIndex::class)->name('templates.index');
+    Route::get('/templates/create', TemplatesCreate::class)->name('templates.create');
+    Route::get('/templates/{template}/edit', TemplatesEdit::class)->name('templates.edit');
 
     // Exports
     Route::get('/projects/{project}/exports/project-kit', [ProjectExportController::class, 'projectKit'])

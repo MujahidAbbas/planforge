@@ -2,10 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Enums\TaskCategory;
+use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Relaticle\Flowforge\Services\DecimalPosition;
 
 /**
  * @extends Factory<Task>
@@ -32,7 +35,7 @@ class TaskFactory extends Factory
             'labels' => ['backend', 'priority:high'],
             'depends_on' => [],
             'status' => TaskStatus::Todo,
-            'position' => fake()->numberBetween(0, 100),
+            'position' => DecimalPosition::forEmptyColumn(),
         ];
     }
 
@@ -54,6 +57,27 @@ class TaskFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => TaskStatus::Done,
+        ]);
+    }
+
+    public function withPosition(string $position): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'position' => $position,
+        ]);
+    }
+
+    public function withCategory(TaskCategory $category): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'category' => $category,
+        ]);
+    }
+
+    public function withPriority(TaskPriority $priority): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'priority' => $priority,
         ]);
     }
 }

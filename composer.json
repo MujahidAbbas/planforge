@@ -15,7 +15,7 @@
         "livewire/livewire": "^3.6.4",
         "livewire/volt": "^1.7.0",
         "prism-php/prism": "^0.99.7",
-        "relaticle/flowforge": "^2.2"
+        "relaticle/flowforge": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

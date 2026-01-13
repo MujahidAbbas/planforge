@@ -28,9 +28,10 @@ class GeneratePrdJob implements ShouldBeUnique, ShouldQueue
 
     public int $tries = 5;
 
+    /** @var array<int, int> */
     public array $backoff = [10, 30, 60, 120, 300];
 
-    public int $uniqueFor = 3600; // 1 hour
+    public int $uniqueFor = 3600;
 
     public function __construct(public string $planRunId)
     {
@@ -42,6 +43,9 @@ class GeneratePrdJob implements ShouldBeUnique, ShouldQueue
         return $this->planRunId.':prd';
     }
 
+    /**
+     * @return array<int, object>
+     */
     public function middleware(): array
     {
         return [new RateLimited('llm:requests')];
@@ -68,9 +72,15 @@ class GeneratePrdJob implements ShouldBeUnique, ShouldQueue
         ]);
 
         try {
+            // Load template if set
+            $template = $run->project->prdTemplate;
+
             $providerEnum = $this->resolveProvider($run->provider);
             $system = view('prompts.prd.system')->render();
-            $prompt = view('prompts.prd.user', ['project' => $run->project])->render();
+            $prompt = view('prompts.prd.user', [
+                'project' => $run->project,
+                'template' => $template,
+            ])->render();
 
             $response = Prism::text()
                 ->using($providerEnum, $run->model)
@@ -108,6 +118,11 @@ class GeneratePrdJob implements ShouldBeUnique, ShouldQueue
 
             // Point document to new version
             $doc->update(['current_version_id' => $version->id]);
+
+            // Record template usage
+            if ($template) {
+                $template->recordUsage();
+            }
 
             // Mark step as succeeded
             $step->update([

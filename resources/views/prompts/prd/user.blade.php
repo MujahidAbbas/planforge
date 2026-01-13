@@ -14,4 +14,17 @@ Please create a Product Requirements Document (PRD) for the following project:
 @endforeach
 @endif
 
+@if($template && count($template->sections) > 0)
+## Document Structure
+
+Please structure the PRD with the following sections:
+
+{!! $template->getFormattedSectionsForPrompt() !!}
+
+@if($template->ai_instructions)
+## Additional Instructions
+{{ $template->ai_instructions }}
+@endif
+@endif
+
 Please generate a complete PRD in markdown format.

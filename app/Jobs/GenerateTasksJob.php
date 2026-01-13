@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Log;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Exceptions\PrismRateLimitedException;
 use Prism\Prism\Facades\Prism;
-use Relaticle\Flowforge\Services\Rank;
+use Relaticle\Flowforge\Services\DecimalPosition;
 use Throwable;
 
 class GenerateTasksJob implements ShouldBeUnique, ShouldQueue
@@ -146,8 +146,8 @@ class GenerateTasksJob implements ShouldBeUnique, ShouldQueue
             $tasks = $structured['tasks'] ?? [];
             $tempIdMap = [];
 
-            // Generate lexicographic positions for proper Flowforge ordering
-            $currentRank = Rank::forEmptySequence();
+            // Generate decimal positions for Flowforge ordering
+            $currentPosition = DecimalPosition::forEmptyColumn();
 
             foreach ($tasks as $data) {
                 $task = Task::create([
@@ -165,11 +165,11 @@ class GenerateTasksJob implements ShouldBeUnique, ShouldQueue
                     'source_refs' => $data['source_refs'] ?? [],
                     'labels' => $data['labels'] ?? [],
                     'depends_on' => [],
-                    'position' => $currentRank->get(),
+                    'position' => $currentPosition,
                 ]);
 
                 // Generate next position
-                $currentRank = Rank::after($currentRank);
+                $currentPosition = DecimalPosition::after($currentPosition);
 
                 if (isset($data['temp_id'])) {
                     $tempIdMap[$data['temp_id']] = $task->id;
