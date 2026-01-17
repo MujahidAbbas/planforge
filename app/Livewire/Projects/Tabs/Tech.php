@@ -38,6 +38,12 @@ class Tech extends Component
     }
 
     #[Computed]
+    public function project(): Project
+    {
+        return Project::with('techTemplate')->findOrFail($this->projectId);
+    }
+
+    #[Computed]
     public function document(): ?Document
     {
         return Document::query()

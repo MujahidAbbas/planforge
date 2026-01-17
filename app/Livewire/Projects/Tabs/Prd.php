@@ -35,6 +35,12 @@ class Prd extends Component
     }
 
     #[Computed]
+    public function project(): Project
+    {
+        return Project::with('prdTemplate')->findOrFail($this->projectId);
+    }
+
+    #[Computed]
     public function document(): ?Document
     {
         return Document::query()
