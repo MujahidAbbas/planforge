@@ -84,10 +84,10 @@ class GeneratePrdJob implements ShouldBeUnique, ShouldQueue
 
             $response = Prism::text()
                 ->using($providerEnum, $run->model)
-                ->withMaxTokens(4000)
+                ->withMaxTokens(6000)
                 ->withSystemPrompt($system)
                 ->withPrompt($prompt)
-                ->withClientOptions(['timeout' => 120])
+                ->withClientOptions(['timeout' => 150])
                 ->asText();
 
             // Store rate limit info from successful response
