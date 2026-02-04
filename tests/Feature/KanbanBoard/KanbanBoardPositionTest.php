@@ -111,7 +111,7 @@ describe('KanbanBoard Position Management', function () {
             $task3->refresh();
             $task1->refresh();
 
-            expect(DecimalPosition::lessThan($task3->position, $task1->position))->toBeTrue();
+            expect(DecimalPosition::lessThan((string) $task3->position, (string) $task1->position))->toBeTrue();
         });
 
         it('can move card to bottom of column', function () {
@@ -135,7 +135,7 @@ describe('KanbanBoard Position Management', function () {
             $task1->refresh();
             $task2->refresh();
 
-            expect(DecimalPosition::greaterThan($task1->position, $task2->position))->toBeTrue();
+            expect(DecimalPosition::greaterThan((string) $task1->position, (string) $task2->position))->toBeTrue();
         });
 
         it('can move card between two cards', function () {
@@ -165,8 +165,8 @@ describe('KanbanBoard Position Management', function () {
             $task2->refresh();
             $task3->refresh();
 
-            expect(DecimalPosition::greaterThan($task3->position, $task1->position))->toBeTrue();
-            expect(DecimalPosition::lessThan($task3->position, $task2->position))->toBeTrue();
+            expect(DecimalPosition::greaterThan((string) $task3->position, (string) $task1->position))->toBeTrue();
+            expect(DecimalPosition::lessThan((string) $task3->position, (string) $task2->position))->toBeTrue();
         });
 
         it('calculates position between adjacent cards', function () {
@@ -191,8 +191,8 @@ describe('KanbanBoard Position Management', function () {
 
             $task3->refresh();
 
-            expect(DecimalPosition::greaterThan($task3->position, $position1))->toBeTrue();
-            expect(DecimalPosition::lessThan($task3->position, $position2))->toBeTrue();
+            expect(DecimalPosition::greaterThan((string) $task3->position, $position1))->toBeTrue();
+            expect(DecimalPosition::lessThan((string) $task3->position, $position2))->toBeTrue();
         });
     });
 
@@ -299,8 +299,8 @@ describe('KanbanBoard Position Management', function () {
             $task3->refresh();
 
             // Order should be: task3, task1, task2
-            expect(DecimalPosition::lessThan($task3->position, $task1->position))->toBeTrue();
-            expect(DecimalPosition::lessThan($task1->position, $task2->position))->toBeTrue();
+            expect(DecimalPosition::lessThan((string) $task3->position, (string) $task1->position))->toBeTrue();
+            expect(DecimalPosition::lessThan((string) $task1->position, (string) $task2->position))->toBeTrue();
         });
 
         it('dispatches kanban-card-moved event after successful move', function () {

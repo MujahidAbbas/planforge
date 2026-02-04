@@ -79,6 +79,16 @@ class Workspace extends Component
         $this->dispatch('planRunStarted', runId: $run->id);
     }
 
+    /**
+     * Handle startPlanRun event from child components (PRD/Tech tabs)
+     * to trigger generation when a template is selected
+     */
+    #[On('startPlanRun')]
+    public function handleStartPlanRun(): void
+    {
+        $this->generate();
+    }
+
     #[On('docUpdated')]
     #[On('planRunCompleted')]
     public function refreshProject(): void
