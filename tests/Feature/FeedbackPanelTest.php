@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\DocumentType;
 use App\Enums\FeedbackType;
 use App\Jobs\GenerateFeedbackJob;
 use App\Livewire\Projects\Partials\FeedbackPanel;
